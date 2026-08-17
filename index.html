@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catlery | Cute Cutlery & Tableware</title>
+    <meta name="description" content="Adorable, giftable cutlery and tableware sets — shop the full Catlery collection.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/storefront.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <a href="index.html" class="logo">
+            <span class="logo-icon">CT</span>
+            <span>Catlery</span>
+        </a>
+
+        <button type="button" id="navbar-toggle" class="navbar-toggle" aria-label="Open menu" aria-expanded="false">
+            <span></span>
+        </button>
+        <div id="nav-backdrop" class="nav-backdrop"></div>
+
+        <nav id="main-nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a onclick="openContactModal()">Contact</a></li>
+                <li><a id="nav-wishlist" onclick="openWishlistModal()" style="display:none;">Wishlist <span id="wishlist-count" class="wishlist-badge">0</span></a></li>
+                <li><a id="nav-orders" onclick="openOrdersModal()" style="display:none;">My Orders</a></li>
+                <li><a id="nav-admin-link" href="admin.html" style="display:none; color: var(--rose);">Admin</a></li>
+                <li><a onclick="openCartModal()">Cart <span id="cart-count" class="cart-badge">0</span></a></li>
+                <li><span id="user-welcome-msg" style="display:none; font-weight:600; color:var(--ink); text-transform:none;"></span></li>
+                <li><a id="nav-auth-btn" onclick="openAuthModal()">Login / Sign Up</a></li>
+                <li><a id="nav-logout-btn" onclick="logoutUser()" style="display:none; color:#dc3545;">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="scallop-divider gold"></div>
+
+    <!-- Main Storefront Container -->
+    <div class="container">
+        <div class="toolbar">
+            <div class="search-box">
+                <input type="search" id="product-search" placeholder="Search products…" aria-label="Search products">
+            </div>
+        </div>
+
+        <!-- Category Filter Chips Bar -->
+        <div id="category-chips" class="category-bar"><!-- Dynamically populated --></div>
+
+        <!-- Product Grid -->
+        <div id="product-grid" class="product-grid"><!-- Dynamically populated --></div>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Auth Modal (Login / Register) -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <button type="button" class="close-modal" onclick="closeAuthModal()" aria-label="Close">&times;</button>
+            <h2 id="auth-title" style="margin-bottom: 20px;">Login to Your Account</h2>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="auth-email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="auth-password" placeholder="Enter your password">
+            </div>
+            <div class="form-group" id="auth-phone-group" style="display:none;">
+                <label>Phone Number</label>
+                <input type="tel" id="auth-phone" placeholder="Enter your phone number">
+            </div>
+            <button id="auth-submit-btn" class="btn" onclick="handleAuthSubmit()">Login</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 14px;">
+                <span id="auth-switch-text">Don't have an account?</span>
+                <a onclick="toggleAuthMode()" style="color: var(--rose); cursor: pointer; font-weight: bold;">Register</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button type="button" class="close-modal" onclick="closeCartModal()" aria-label="Close">&times;</button>
+            <h2 style="margin-bottom: 20px;">Your Shopping Cart</h2>
+            <div id="cart-items-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--blush); padding-top: 15px; margin-bottom: 20px;">
+                <strong style="font-size: 18px;">Total:</strong>
+                <strong style="font-size: 20px; color: var(--rose);"><span id="cart-total">₹0.00</span></strong>
+            </div>
+            <button class="btn" onclick="checkoutOrder()">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Wishlist Modal -->
+    <div id="wishlist-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button type="button" class="close-modal" onclick="closeWishlistModal()" aria-label="Close">&times;</button>
+            <h2 style="margin-bottom: 20px;">Your Wishlist</h2>
+            <div id="wishlist-items-container" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- Orders History Modal -->
+    <div id="orders-modal" class="modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <button type="button" class="close-modal" onclick="closeOrdersModal()" aria-label="Close">&times;</button>
+            <h2 style="margin-bottom: 20px;">My Order History</h2>
+            <div id="orders-list-container" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- Contact Us Modal -->
+    <div id="contact-modal" class="modal">
+        <div class="modal-content">
+            <button type="button" class="close-modal" onclick="closeContactModal()" aria-label="Close">&times;</button>
+            <h2 style="margin-bottom: 20px;">Contact Us</h2>
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" id="contact-name" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label>Your Email</label>
+                <input type="email" id="contact-email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea id="contact-msg" rows="4" placeholder="How can we help you?"></textarea>
+            </div>
+            <button class="btn" onclick="submitContactForm()">Send Message</button>
+        </div>
+    </div>
+
+    <div class="scallop-divider"></div>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">Catlery</div>
+            <ul class="footer-links">
+                <li><a onclick="openContactModal()">Contact Us</a></li>
+                <li><a onclick="openWishlistModal()">Wishlist</a></li>
+                <li><a onclick="openOrdersModal()">My Orders</a></li>
+                <li><a href="admin.html">Admin Login</a></li>
+            </ul>
+        </div>
+        <div class="footer-note">© 2026 Catlery. All rights reserved.</div>
+    </footer>
+
+    <!-- Firebase SDKs (compat) — deferred so they never block first paint -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js" defer></script>
+
+    <!-- App scripts — deferred, execute in order after the DOM & Firebase SDKs are ready -->
+    <script src="js/firebase-init.js" defer></script>
+    <script src="js/utils.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/products.js" defer></script>
+    <script src="js/cart.js" defer></script>
+    <script src="js/wishlist.js" defer></script>
+    <script src="js/orders.js" defer></script>
+    <script src="js/main.js" defer></script>
+</body>
+</html>

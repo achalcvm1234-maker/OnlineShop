@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Catlery Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-topbar">
+        <button type="button" class="hamburger" id="sidebar-toggle" aria-label="Open menu"><span></span></button>
+        <span class="title">Dashboard</span>
+    </div>
+
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+    <div id="sidebar">
+        <div class="sidebar-brand">
+            <span class="logo-icon" style="background:var(--rose); border-radius:50%; display:flex; align-items:center; justify-content:center;">CT</span>
+            <span>Catlery Admin</span>
+            <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Close menu">&times;</button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a class="menu-item active" href="admin-dashboard.html">Dashboard</a></li>
+            <li><a class="menu-item" href="admin-products.html">Manage Products</a></li>
+            <li><a class="menu-item" href="admin-categories.html">Manage Categories</a></li>
+            <li><a class="menu-item" href="admin-orders.html">Manage Orders</a></li>
+            <li><a class="menu-item" href="admin-users.html">Manage Users</a></li>
+            <li><a class="menu-item" href="index.html">View Storefront</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebar-user-email"></div>
+            <button type="button" class="logout-btn" onclick="logoutUser()">Logout</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <h1 style="margin-bottom: 25px;">Dashboard Overview</h1>
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h3>Total Products</h3>
+                <p id="stat-total-products">–</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Categories</h3>
+                <p id="stat-total-categories">–</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Orders</h3>
+                <p id="stat-total-orders">–</p>
+            </div>
+            <div class="stat-card">
+                <h3>Registered Users</h3>
+                <p id="stat-total-users">–</p>
+            </div>
+        </div>
+        <div class="admin-card">
+            <h2 style="font-size:18px;">Welcome back</h2>
+            <p style="color:var(--ink-soft);">Use the menu to manage products, categories, customer orders and registered users. Two newer storefront features to know about: customers can now <strong>search products live</strong> from the header, and save items to a <strong>Wishlist</strong> — both work automatically with your existing product catalog, no setup needed.</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js" defer></script>
+
+    <script src="js/firebase-init.js" defer></script>
+    <script src="js/utils.js" defer></script>
+    <script src="js/admin-common.js" defer></script>
+    <script src="js/admin-dashboard.js" defer></script>
+</body>
+</html>

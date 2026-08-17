@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products | Catlery Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-topbar">
+        <button type="button" class="hamburger" id="sidebar-toggle" aria-label="Open menu"><span></span></button>
+        <span class="title">Manage Products</span>
+    </div>
+
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+    <div id="sidebar">
+        <div class="sidebar-brand">
+            <span class="logo-icon" style="background:var(--rose); border-radius:50%; display:flex; align-items:center; justify-content:center;">CT</span>
+            <span>Catlery Admin</span>
+            <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Close menu">&times;</button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a class="menu-item" href="admin-dashboard.html">Dashboard</a></li>
+            <li><a class="menu-item active" href="admin-products.html">Manage Products</a></li>
+            <li><a class="menu-item" href="admin-categories.html">Manage Categories</a></li>
+            <li><a class="menu-item" href="admin-orders.html">Manage Orders</a></li>
+            <li><a class="menu-item" href="admin-users.html">Manage Users</a></li>
+            <li><a class="menu-item" href="index.html">View Storefront</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebar-user-email"></div>
+            <button type="button" class="logout-btn" onclick="logoutUser()">Logout</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="admin-card">
+            <h2 style="margin-bottom: 20px; font-size: 20px;">Add New Product</h2>
+            <div class="form-group">
+                <label>Select Category</label>
+                <select id="prod-category"></select>
+            </div>
+            <div class="form-group">
+                <label>Product Title</label>
+                <input type="text" id="prod-title" placeholder="e.g., Cute Kitty Spoon Set">
+            </div>
+            <div class="form-group">
+                <label>Price (₹)</label>
+                <input type="number" id="prod-price" placeholder="19.99">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="prod-desc" rows="3" placeholder="Enter description..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Size Configuration Type</label>
+                <select id="size-type-select" onchange="toggleSizeInputs()">
+                    <option value="none">No Size Required</option>
+                    <option value="checkbox">Standard (Checkbox - All Sizes Available)</option>
+                    <option value="manual">Manual Sizes (Comma separated)</option>
+                </select>
+            </div>
+            <div class="form-group" id="manual-size-group" style="display:none;">
+                <label>Manual Sizes (e.g., S, M, L, XL)</label>
+                <input type="text" id="prod-manual-sizes" placeholder="S, M, L, XL">
+            </div>
+            <div class="form-group">
+                <label>Upload Images (Min 1, Max 4 images)</label>
+                <div class="dropzone" id="prod-images-dropzone" tabindex="0" role="button" aria-label="Upload product images: click or drag and drop">
+                    <div class="dropzone-icon">⬆</div>
+                    <div class="dropzone-text"><strong>Click to upload</strong> or drag &amp; drop</div>
+                    <div class="dropzone-hint">JPG or PNG — 1 to 4 images</div>
+                    <div class="dropzone-preview" id="prod-images-preview"></div>
+                </div>
+                <input type="file" id="prod-images" accept="image/*" multiple class="visually-hidden">
+                <div class="form-hint">Images are compressed automatically to keep the site fast.</div>
+            </div>
+            <button class="btn" id="add-product-btn" onclick="handleAddProduct()">Save Product</button>
+        </div>
+
+        <div class="section-head">
+            <h2>Existing Products</h2>
+            <button type="button" class="btn btn-danger" onclick="deleteSelectedProducts()">Delete Selected</button>
+        </div>
+        <div id="admin-products-list" class="table-responsive"></div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="edit-product-modal" class="modal">
+        <div class="modal-content" style="max-width:500px;">
+            <button type="button" class="close-modal" onclick="closeEditProductModal()" aria-label="Close">&times;</button>
+            <h2 style="margin-bottom:20px; font-size:20px;">Edit Product</h2>
+            <input type="hidden" id="edit-prod-id">
+            <div class="form-group">
+                <label>Select Category</label>
+                <select id="edit-prod-category"></select>
+            </div>
+            <div class="form-group">
+                <label>Product Title</label>
+                <input type="text" id="edit-prod-title">
+            </div>
+            <div class="form-group">
+                <label>Price (₹)</label>
+                <input type="number" id="edit-prod-price">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="edit-prod-desc" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Size Configuration Type</label>
+                <select id="edit-size-type-select" onchange="toggleEditSizeInputs()">
+                    <option value="none">No Size Required</option>
+                    <option value="checkbox">Standard (Checkbox - All Sizes Available)</option>
+                    <option value="manual">Manual Sizes (Comma separated)</option>
+                </select>
+            </div>
+            <div class="form-group" id="edit-manual-size-group" style="display:none;">
+                <label>Manual Sizes (e.g., S, M, L, XL)</label>
+                <input type="text" id="edit-prod-manual-sizes">
+            </div>
+            <div class="form-group">
+                <label>Replace Images (optional — leave empty to keep current images, up to 4)</label>
+                <div class="dropzone" id="edit-prod-images-dropzone" tabindex="0" role="button" aria-label="Upload replacement product images: click or drag and drop">
+                    <div class="dropzone-icon">⬆</div>
+                    <div class="dropzone-text"><strong>Click to upload</strong> or drag &amp; drop</div>
+                    <div class="dropzone-hint">JPG or PNG — up to 4 images</div>
+                    <div class="dropzone-preview" id="edit-prod-images-preview"></div>
+                </div>
+                <input type="file" id="edit-prod-images" accept="image/*" multiple class="visually-hidden">
+            </div>
+            <button class="btn" id="save-edit-btn" style="width:100%;" onclick="saveEditedProduct()">Update Product</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js" defer></script>
+
+    <script src="js/firebase-init.js" defer></script>
+    <script src="js/utils.js" defer></script>
+    <script src="js/admin-common.js" defer></script>
+    <script src="js/admin-products.js" defer></script>
+</body>
+</html>
