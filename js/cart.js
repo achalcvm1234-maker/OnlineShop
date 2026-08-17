@@ -1,13 +1,36 @@
 // ==================== PERSISTENT CART LOGIC ====================
+// cartItemsCache is the in-memory source of truth for the cart while the
+// app is open. Every mutation (qty, select, remove) updates this array
+// and re-renders instantly — Firestore is only touched afterwards, in
+// the background, so the person never waits on a network round trip
+// just to see a + or - register.
+let cartItemsCache = [];
+let cartSaveTimer = null;
+
 async function loadUserCart() {
-    if (!currentUser) return;
+    if (!currentUser) {
+        cartItemsCache = [];
+        updateCartUI(cartItemsCache);
+        return;
+    }
     const cartDoc = await db.collection('carts').doc(currentUser.uid).get();
-    updateCartUI(cartDoc.exists ? (cartDoc.data().items || []) : []);
+    cartItemsCache = cartDoc.exists ? (cartDoc.data().items || []) : [];
+    updateCartUI(cartItemsCache);
 }
 
-async function saveUserCart(items) {
+// Debounced background save: rapid-fire +/- clicks coalesce into a
+// single Firestore write ~350ms after the last change, instead of one
+// write per click.
+function persistCartSoon() {
     if (!currentUser) return;
-    await db.collection('carts').doc(currentUser.uid).set({ items });
+    if (cartSaveTimer) clearTimeout(cartSaveTimer);
+    const uid = currentUser.uid;
+    const snapshot = cartItemsCache.slice(); // capture current state for this save
+    cartSaveTimer = setTimeout(() => {
+        db.collection('carts').doc(uid).set({ items: snapshot }).catch(err => {
+            console.error('Cart save failed:', err);
+        });
+    }, 350);
 }
 
 async function addToCart(productId, showAlert = true) {
@@ -34,14 +57,11 @@ async function addToCart(productId, showAlert = true) {
         if (selectElem) selectedSize = selectElem.value;
     }
 
-    const cartDoc = await db.collection('carts').doc(currentUser.uid).get();
-    let items = cartDoc.exists ? (cartDoc.data().items || []) : [];
-
-    const existingIndex = items.findIndex(item => item.productId === productId && item.size === selectedSize);
+    const existingIndex = cartItemsCache.findIndex(item => item.productId === productId && item.size === selectedSize);
     if (existingIndex > -1) {
-        items[existingIndex].qty += 1;
+        cartItemsCache[existingIndex].qty += 1;
     } else {
-        items.push({
+        cartItemsCache.push({
             productId: product.id,
             title: product.title,
             price: product.price,
@@ -52,8 +72,8 @@ async function addToCart(productId, showAlert = true) {
         });
     }
 
-    await saveUserCart(items);
-    updateCartUI(items);
+    updateCartUI(cartItemsCache);
+    persistCartSoon();
     if (showAlert) showCustomAlert('Product added to cart successfully!');
     return true;
 }
@@ -123,66 +143,48 @@ function updateCartUI(items) {
     totalElem.innerText = formatPrice(total);
 }
 
-async function toggleCartSelectAll(checked) {
+function toggleCartSelectAll(checked) {
     if (!currentUser) return;
-    const cartDoc = await db.collection('carts').doc(currentUser.uid).get();
-    if (!cartDoc.exists) return;
-    let items = cartDoc.data().items || [];
-    items.forEach(item => { item.selected = checked; });
-    await saveUserCart(items);
-    updateCartUI(items);
+    cartItemsCache.forEach(item => { item.selected = checked; });
+    updateCartUI(cartItemsCache);
+    persistCartSoon();
 }
 
-async function removeSelectedCartItems() {
+function removeSelectedCartItems() {
     if (!currentUser) return;
-    const cartDoc = await db.collection('carts').doc(currentUser.uid).get();
-    if (!cartDoc.exists) return;
-    let items = cartDoc.data().items || [];
-    const remainingItems = items.filter(item => item.selected === false);
+    const remaining = cartItemsCache.filter(item => item.selected === false);
 
-    if (remainingItems.length === items.length) {
+    if (remaining.length === cartItemsCache.length) {
         showCustomAlert('Please select at least one item to remove.');
         return;
     }
 
-    await saveUserCart(remainingItems);
-    updateCartUI(remainingItems);
+    cartItemsCache = remaining;
+    updateCartUI(cartItemsCache);
+    persistCartSoon();
     showCustomAlert('Selected items removed successfully!');
 }
 
-async function toggleCartItemSelection(index, isChecked) {
-    if (!currentUser) return;
-    const cartDoc = await db.collection('carts').doc(currentUser.uid).get();
-    if (!cartDoc.exists) return;
-    let items = cartDoc.data().items || [];
-    if (items[index]) {
-        items[index].selected = isChecked;
-        await saveUserCart(items);
-        updateCartUI(items);
-    }
+function toggleCartItemSelection(index, isChecked) {
+    if (!currentUser || !cartItemsCache[index]) return;
+    cartItemsCache[index].selected = isChecked;
+    updateCartUI(cartItemsCache);
+    persistCartSoon();
 }
 
-async function changeCartItemQty(index, change) {
-    if (!currentUser) return;
-    const cartDoc = await db.collection('carts').doc(currentUser.uid).get();
-    if (!cartDoc.exists) return;
-    let items = cartDoc.data().items || [];
-    if (items[index]) {
-        items[index].qty += change;
-        if (items[index].qty <= 0) items.splice(index, 1);
-        await saveUserCart(items);
-        updateCartUI(items);
-    }
+function changeCartItemQty(index, change) {
+    if (!currentUser || !cartItemsCache[index]) return;
+    cartItemsCache[index].qty += change;
+    if (cartItemsCache[index].qty <= 0) cartItemsCache.splice(index, 1);
+    updateCartUI(cartItemsCache);
+    persistCartSoon();
 }
 
-async function removeCartItem(index) {
+function removeCartItem(index) {
     if (!currentUser) return;
-    const cartDoc = await db.collection('carts').doc(currentUser.uid).get();
-    if (!cartDoc.exists) return;
-    let items = cartDoc.data().items || [];
-    items.splice(index, 1);
-    await saveUserCart(items);
-    updateCartUI(items);
+    cartItemsCache.splice(index, 1);
+    updateCartUI(cartItemsCache);
+    persistCartSoon();
 }
 
 function openCartModal() {
@@ -191,7 +193,11 @@ function openCartModal() {
         openAuthModal();
         return;
     }
-    loadUserCart();
+    // Render instantly from the local cache — no network wait to open —
+    // then quietly re-sync with Firestore in case another device/tab
+    // changed the cart since it was last loaded.
+    updateCartUI(cartItemsCache);
     document.getElementById('cart-modal').style.display = 'flex';
+    loadUserCart();
 }
 function closeCartModal() { document.getElementById('cart-modal').style.display = 'none'; }

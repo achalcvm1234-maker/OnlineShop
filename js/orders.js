@@ -8,14 +8,16 @@ async function checkoutOrder() {
         return;
     }
 
-    const cartDoc = await db.collection('carts').doc(currentUser.uid).get();
-    if (!cartDoc.exists || !cartDoc.data().items || cartDoc.data().items.length === 0) {
+    // Checkout reads from cartItemsCache (the in-memory source of truth),
+    // not a fresh Firestore fetch — a qty/select change can still be
+    // sitting in the debounced save queue, so re-fetching here could
+    // read stale data and checkout the wrong quantities.
+    if (cartItemsCache.length === 0) {
         showCustomAlert('Your cart is empty.');
         return;
     }
 
-    const allItems = cartDoc.data().items;
-    const selectedItems = allItems.filter(item => item.selected !== false);
+    const selectedItems = cartItemsCache.filter(item => item.selected !== false);
 
     if (selectedItems.length === 0) {
         showCustomAlert('Please select at least one item to checkout.');
@@ -34,10 +36,14 @@ async function checkoutOrder() {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        const remainingItems = allItems.filter(item => item.selected === false);
-        await db.collection('carts').doc(currentUser.uid).set({ items: remainingItems });
+        // Cancel any pending debounced cart save — we're about to write
+        // the authoritative post-checkout cart state ourselves.
+        if (cartSaveTimer) clearTimeout(cartSaveTimer);
 
-        updateCartUI(remainingItems);
+        cartItemsCache = cartItemsCache.filter(item => item.selected === false);
+        await db.collection('carts').doc(currentUser.uid).set({ items: cartItemsCache });
+
+        updateCartUI(cartItemsCache);
         closeCartModal();
         showCustomAlert('Selected order(s) successfully placed!');
     } catch (err) {
