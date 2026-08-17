@@ -39,6 +39,13 @@
 html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    /* Kills the default translucent tap-flash Android Chrome draws over
+       whatever block it thinks was tapped. With event delegation, that
+       flash can visually cover the whole card even though only the
+       button's own click handler actually fires — misleading, not a
+       functional bug, but worth removing. Real press feedback is added
+       explicitly below via :active states instead. */
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
