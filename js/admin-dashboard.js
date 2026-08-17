@@ -1,0 +1,3 @@
+window.pageInit = function () {
+    loadDashboardStats();
+};
