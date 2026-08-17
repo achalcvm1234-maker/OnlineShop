@@ -1,0 +1,301 @@
+/* =====================================================================
+   Catlery — Shared Components
+   ===================================================================== */
+
+/* ---------- Buttons ---------- */
+.btn {
+    background: var(--rose);
+    color: var(--white);
+    border: none;
+    padding: 13px 18px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 6px 16px rgba(196, 24, 79, 0.22);
+}
+
+.btn:hover { background: var(--rose-deep); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-secondary {
+    background: var(--ink-soft);
+    box-shadow: 0 6px 16px rgba(124, 92, 104, 0.18);
+}
+.btn-secondary:hover { background: #5F4451; }
+
+.btn-outline {
+    background: transparent;
+    color: var(--rose);
+    border: 1.5px solid var(--rose);
+    box-shadow: none;
+}
+.btn-outline:hover { background: var(--blush); color: var(--rose-deep); }
+
+.btn-danger {
+    background: var(--danger);
+    box-shadow: 0 6px 16px rgba(220, 53, 69, 0.2);
+    padding: 8px 14px;
+    font-size: 12px;
+    width: auto;
+}
+.btn-danger:hover { background: var(--danger-deep); }
+
+.btn-sm {
+    width: auto;
+    padding: 8px 14px;
+    font-size: 11.5px;
+}
+
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ---------- Forms ---------- */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--blush-deep);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--cream);
+    transition: border-color 0.2s ease, background 0.2s ease;
+    font-family: var(--font-body);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--rose);
+    background: var(--white);
+}
+
+.form-hint {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+}
+
+/* ---------- Chips ---------- */
+.chip {
+    background: var(--white);
+    border: 1.5px solid var(--blush-deep);
+    color: var(--ink-soft);
+    padding: 10px 22px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    border-width: 1.5px;
+    white-space: nowrap;
+}
+
+.chip.active, .chip:hover {
+    background: var(--rose);
+    color: var(--white);
+    border-color: var(--rose);
+    box-shadow: 0 6px 18px rgba(196, 24, 79, 0.25);
+}
+
+/* ---------- Modals ---------- */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(43, 20, 32, 0.55);
+    backdrop-filter: blur(3px);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 16px;
+}
+
+.modal-content {
+    background: var(--white);
+    padding: 32px;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 450px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 60px rgba(43, 20, 32, 0.28);
+}
+
+.close-modal {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--ink-soft);
+    transition: color 0.2s ease, transform 0.2s ease;
+    background: none;
+    border: none;
+}
+.close-modal:hover { color: var(--rose); transform: rotate(90deg); }
+
+/* ---------- Tables (responsive → cards on mobile) ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-top: 16px;
+}
+
+th, td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--blush);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+th {
+    background: var(--blush);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--cream); }
+
+/* ---------- Order line items & status (used in storefront + admin) ---------- */
+.order-items-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+    background: var(--cream);
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--blush);
+}
+.order-items-mini img { width: 38px; height: 38px; object-fit: cover; border-radius: 5px; }
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: #E4F5EA;
+    color: var(--success);
+    text-transform: capitalize;
+}
+
+.row-thumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.row-thumb img {
+    width: 42px; height: 42px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--blush-deep);
+    flex-shrink: 0;
+}
+
+/* ---------- Empty / loading states ---------- */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-soft);
+    font-size: 14px;
+}
+
+.loading-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-soft);
+    font-size: 14px;
+}
+.loading-state::before {
+    content: '';
+    display: block;
+    width: 30px; height: 30px;
+    margin: 0 auto 12px;
+    border: 3px solid var(--blush-deep);
+    border-top-color: var(--rose);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Responsive tables → stacked cards on small screens ---------- */
+@media (max-width: 700px) {
+    .table-responsive table,
+    .table-responsive thead,
+    .table-responsive tbody,
+    .table-responsive th,
+    .table-responsive td,
+    .table-responsive tr {
+        display: block;
+    }
+    .table-responsive thead { display: none; }
+    .table-responsive tr {
+        margin-bottom: 14px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        background: var(--white);
+    }
+    .table-responsive td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        text-align: right;
+        border-bottom: 1px solid var(--blush);
+    }
+    .table-responsive td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.4px;
+        color: var(--ink-soft);
+        text-align: left;
+        margin-right: auto;
+    }
+    .table-responsive td:last-child { border-bottom: none; }
+}
